@@ -64,7 +64,25 @@ app.post("/login", async (req, res) => {
     if (err) {
       res.status(400).send({ message: "Password comparison error :" + err });
     } else if (result) {
-      res.status(200).send({ message: "Password matched" });
+
+      const token = jwt.sign(
+        { user_id: user._id, email: user.email },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: "1S",
+        }
+      );
+
+      const refreshToken = jwt.sign(
+        { user_id: user._id,  email: user.email },
+        process.env.REFRESH_KEY,
+        {
+          expiresIn: "1D",
+        }
+      );
+
+
+      res.status(200).send({message : "Password Matched", token: token, refreshToken : refreshToken});
     } else {
       res.status(400).send({ message: "Password is incorrect" });
     }
